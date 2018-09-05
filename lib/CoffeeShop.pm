@@ -7,41 +7,29 @@ use Data::Dumper;
 
 # This method will run once at server start
 sub startup {
-  my $self = shift;
-
-  $self->secrets(['Mary Had a Little Lamb']);
-
-  # Load configuration from hash returned by "my_app.conf"
-  my $config = $self->plugin('Config');
-  my $log    = $self->log;
+    my $self   = shift;
+    my $config = $self->plugin('Config');
+    my $log    = $self->log;
 
     $log->warn("Mojolicious Mode is " . $self->mode);
     $log->warn("Log Level        is " . $log->level);
     $log->warn("App Path         is " . $self->home);
 
     $self->{dbh} = DBI->connect("dbi:SQLite:dbname=".path($self->home, $config->{sqlite3_db_file}), "", "") or die $DBI::errstr;
-    $self->{dbh}->do("PRAGMA foreign_keys=ON");
+    $self->{dbh}->do("PRAGMA foreign_keys=ON") or die $DBI::errstr;
 
-    #my $rows = $self->dbh->selectall_arrayref("select * from user");
-    #$log->warn(Dumper $rows);
+    my $r = $self->routes;
 
-  # Documentation browser under "/perldoc"
-  $self->plugin('PODRenderer') if $config->{perldoc};
-
-  # Router
-  my $r = $self->routes;
-
-  # Normal route to controller
-  $r->get('/')->to('example#welcome');
-  $r->put('/user/request')->to('user#request');
-  $r->post('/machine')->to('machine#register');
-  $r->get('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume');
-  $r->put('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume_ts');
+    $r->get('/')->to('example#welcome');
+    $r->put('/user/request')->to('user#request');
+    $r->post('/machine')->to('machine#register');
+    $r->get('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume');
+    $r->put('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume_ts');
 }
 
 sub dbh {
     my $self = shift;
-    $self->{dbh} or die "dbh gone!";
+    $self->{dbh} or die "dbh gone!"; # my be reconnect or use DBIx::Connector
 }
 
 sub error {
