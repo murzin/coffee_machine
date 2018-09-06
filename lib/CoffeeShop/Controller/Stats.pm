@@ -52,7 +52,7 @@ sub caffeine_level {
 sub coffee_history {
   my $c     = shift;
   my $id    = $c->stash('id');
-  my $type  = $c->stash('type');
+  my $type  = $c->stash('type')||'';
   my $dbh   = $c->app->dbh;
 
   if ($type) {
