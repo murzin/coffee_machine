@@ -2,7 +2,7 @@
 
 if [ "$1" = "" -o "$2" = "" -o "$3" = "" ]; then
     echo Not enough arguments.
-    echo Usage: $0 usr_id mch_id iso8601-timestump
+    echo Usage: $0 usr_id mch_id iso8601-UTC-timestamp
     exit
 fi    
 

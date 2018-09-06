@@ -5,7 +5,6 @@ use Mojo::File qw(path);
 use DBI;
 use Data::Dumper;
 
-# This method will run once at server start
 sub startup {
     my $self   = shift;
     my $config = $self->plugin('Config');
@@ -20,19 +19,20 @@ sub startup {
 
     my $r = $self->routes;
 
-    $r->get('/')->to('example#welcome');
+    $r->get('/')->to('hpage');
     $r->put('/user/request')->to('user#request');
     $r->post('/machine')->to('machine#register');
     $r->get('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume');
     $r->put('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume_ts');
 
     $r->get('/stats/coffee')->to('stats#coffee');
-    $r->get('/stats/coffee/:type/:id')->to('stats#coffee');
+    $r->get('/stats/coffee/:type/:id')->to('stats#coffee_history');
+    $r->get('/stats/level/user/:id')->to('stats#caffeine_level');
 }
 
 sub dbh {
     my $self = shift;
-    $self->{dbh} or die "dbh gone!"; # my be reconnect or use DBIx::Connector
+    $self->{dbh} or die "dbh gone!"; # my be add reconnect or use DBIx::Connector later
 }
 
 sub error {

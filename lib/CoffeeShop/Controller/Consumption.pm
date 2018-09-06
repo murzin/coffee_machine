@@ -10,6 +10,11 @@ sub consume {
   my $mch_id = $c->stash('mch_id');
   my $dbh    = $c->app->dbh;
 
+  $usr_id =~ /^\d+$/   
+     or return $c->app->error($c, 400, [idError => 'Wrong user id format']);
+  $mch_id =~ /^\d+$/   
+     or return $c->app->error($c, 400, [idError => 'Wrong machine id format']);
+
   $dbh->do("insert into consumption(usr_id, mch_id, ts) values (?, ?, datetime())",
             {}, $usr_id, $mch_id)
             or return $c->app->error($c, 400, [dbError => $DBI::errstr]);
@@ -23,6 +28,11 @@ sub consume_ts {
   my $usr_id = $c->stash('usr_id');
   my $mch_id = $c->stash('mch_id');
   my $dbh    = $c->app->dbh;
+
+  $usr_id =~ /^\d+$/   
+     or return $c->app->error($c, 400, [idError => 'Wrong user id format']);
+  $mch_id =~ /^\d+$/   
+     or return $c->app->error($c, 400, [idError => 'Wrong machine id format']);
 
   my $ts;
   eval { $ts = DateTime::Format::ISO8601->parse_datetime($args->{timestamp}) };
