@@ -25,6 +25,9 @@ sub startup {
     $r->post('/machine')->to('machine#register');
     $r->get('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume');
     $r->put('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume_ts');
+
+    $r->get('/stats/coffee')->to('stats#coffee');
+    $r->get('/stats/coffee/:type/:id')->to('stats#coffee');
 }
 
 sub dbh {

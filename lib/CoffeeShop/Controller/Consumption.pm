@@ -31,7 +31,7 @@ sub consume_ts {
   }
 
   $dbh->do("insert into consumption(usr_id, mch_id, ts) values (?, ?, ?)",
-           {}, $usr_id, $mch_id, $ts->ymd('-') . ' ' . $ts->hms(':'))
+           {}, $usr_id, $mch_id, $ts->ymd('-') . 'T' . $ts->hms(':'))
            or return $c->app->error($c, 400, [dbError => $DBI::errstr]);
 
   $c->rendered(200);
