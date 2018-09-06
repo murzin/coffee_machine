@@ -8,4 +8,8 @@ if [ "$1" != "" ]; then
     fi    
 fi    
 
-perl -Mojo -E 'say g("localhost:3000/stats/coffee/'$1'/'$2'")->body'
+if [ "$1" != "" ]; then
+    perl -Mojo -E 'say g("localhost:3000/stats/coffee/'$1'/'$2'")->body'
+else
+    perl -Mojo -E 'say g("localhost:3000/stats/coffee")->body'
+fi    

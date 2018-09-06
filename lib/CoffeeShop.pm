@@ -3,7 +3,6 @@ use Mojo::Base 'Mojolicious';
 use Mojo::File qw(path);
 
 use DBI;
-use Data::Dumper;
 
 sub startup {
     my $self   = shift;
@@ -25,7 +24,7 @@ sub startup {
     $r->get('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume');
     $r->put('/coffee/buy/:usr_id/:mch_id')->to('consumption#consume_ts');
 
-    $r->get('/stats/coffee')->to('stats#coffee');
+    $r->get('/stats/coffee')->to('stats#coffee_history');
     $r->get('/stats/coffee/:type/:id')->to('stats#coffee_history');
     $r->get('/stats/level/user/:id')->to('stats#caffeine_level');
 }

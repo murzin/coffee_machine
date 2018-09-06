@@ -11,21 +11,20 @@ sub caffeine_level {
   my $dbh       = $c->app->dbh;
 
   $usr_id =~ /^\d+$/   
-     or return $c->app->error($c, 400, [idError => 'Wrong user id format']);
+    or return $c->app->error($c, 400, [idError => 'Wrong user id format']);
 
   my $dt = DateTime->now->subtract(DateTime::Duration->new({'hours'=>23})); # using hour's upper border
-  my $start_hour = $dt->ymd.'T'.$dt->hour.':00';
 
   my $rows = $dbh->selectall_arrayref("
-  select strftime('%Y-%m-%dT%H:00', datetime(ts, '+1 hour')) as h, mch_caffein_mg_per_cup -- same - using upper border
-  from user
-  join consumption using (usr_id)
-  join coffee_machine using (mch_id)
-  where usr_id = ?
-  and ts > ?
-  order by ts asc
-  ", {Slice => {}}, $usr_id, $dt->ymd.'T'.$dt->hms)
-        or return $c->app->error($c, 400, [dbError => $DBI::errstr]);
+    select strftime('%Y-%m-%dT%H:00', datetime(ts, '+1 hour')) as h, mch_caffein_mg_per_cup -- same - using upper border
+    from user
+    join consumption using (usr_id)
+    join coffee_machine using (mch_id)
+    where usr_id = ?
+    and ts > datetime('now', '-24 hours')
+    order by ts asc
+    ", {Slice => {}}, $usr_id)
+    or return $c->app->error($c, 400, [dbError => $DBI::errstr]);
 
   my $level     = [];
   my $consumed  = {};
@@ -39,7 +38,7 @@ sub caffeine_level {
       my $cur_dt = $dt->clone->add($interval);
       my $key = $cur_dt->ymd.'T'.sprintf('%02d', $cur_dt->hour).':00';
       if ($hour == 0) {
-          push @$level, {$key => 0 + $consumed->{$key}//0};
+          push @$level, {$key => $consumed->{$key}//0};
       } else {
           my ($prev_level) = values %{$level->[-1]}; 
           my $cur_level = sprintf "%.2f", ($prev_level - ($prev_level/100*12.945)); # 12.945% per hour makes appr. 50% per 5 hours
@@ -58,9 +57,9 @@ sub coffee_history {
 
   if ($type) {
       $type =~ /^machine|user$/
-         or return $c->app->error($c, 400, [typeError => 'Unknown stats type']);
+        or return $c->app->error($c, 400, [typeError => 'Unknown stats type']);
       $id =~ /^\d+$/   
-         or return $c->app->error($c, 400, [idError => 'Wrong id format']);
+        or return $c->app->error($c, 400, [idError => 'Wrong id format']);
   }
 
   my $rows = $dbh->selectall_arrayref("
@@ -76,12 +75,12 @@ sub coffee_history {
     "").
     "order by ts asc",
     {Slice => {}}, $type ? $id : ())
-        or return $c->app->error($c, 400, [dbError => $DBI::errstr]);
+    or return $c->app->error($c, 400, [dbError => $DBI::errstr]);
 
   my $history = [];
   for my $row (@$rows) {
-      my $h = {timestamp => $row->{ts}};
-      $h->{user} = {id => $row->{usr_id}, login => $row->{usr_login}}; 
+      my $h         = {timestamp => $row->{ts}};
+      $h->{user}    = {id => $row->{usr_id}, login => $row->{usr_login}}; 
       $h->{machine} = {id => $row->{mch_id}, name => $row->{mch_name}};
       push @$history, $h; 
   }
