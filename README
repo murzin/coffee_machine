@@ -2,12 +2,12 @@
 ### Implements JSON API which allows its users to manage and monitor their caffeine intoxication
 
 ## Depends
-* SQLite 3
-* Perl CPAN Packages:
-    * DBD::SQLite
-    * Mojolicious
-    * DateTime
-    * DateTime::Format::ISO8601
+- SQLite 3
+- Perl CPAN Packages:
+    - DBD::SQLite
+    - Mojolicious
+    - DateTime
+    - DateTime::Format::ISO8601
 
 ## DB
 Uses SQLite 3 database.
